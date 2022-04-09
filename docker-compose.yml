@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   wp:
@@ -35,17 +35,39 @@ services:
     image: mysql:latest # https://hub.docker.com/_/mysql/ - or mariadb https://hub.docker.com/_/mariadb
     ports:
       - 127.0.0.1:3307:3306 # change ip if required
-    command: [
-        '--default_authentication_plugin=mysql_native_password',
-        '--character-set-server=utf8mb4',
-        '--collation-server=utf8mb4_unicode_ci'
-    ]
+    command:
+      [
+        "--default_authentication_plugin=mysql_native_password",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci",
+      ]
     volumes:
       - ./wp-data:/docker-entrypoint-initdb.d
       - db_data:/var/lib/mysql
     environment:
       MYSQL_DATABASE: wordpress
       MYSQL_ROOT_PASSWORD: password
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyAdmin
+    ports:
+      - "80"
+    #volumes:
+    #- ./phpmyadmin/themes:/var/www/html/themes
+    #- ./phpmyadmin/themes2:/var/www/html/themes:ro
+    links:
+      - db
+    depends_on:
+      - db
+    environment:
+      #- PMA_ARBITRARY=1
+      #- "PMA_VERBOSE=Local"
+      PMA_HOSTS: db
+      PMA_USER: root
+      PMA_PASSWORD: password
+      VIRTUAL_HOST: pma.developer.com.br
+      VIRTUAL_PORT: 80
 
 volumes:
   db_data:
